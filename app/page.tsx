@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import DeviceInfo from "@/components/DeviceInfo";
 
 type UserData = {
   coords: { lat: number; lon: number };
@@ -134,11 +135,13 @@ export default function Home() {
             </DialogDescription>
           </DialogHeader>
 
+          <DeviceInfo />
+
           {userData && (
             <div className="space-y-2 p-2 bg-gray-50 rounded-lg">
-              <p><b>Latitude:</b> {userData.coords.lat}</p>
-              <p><b>Longitude:</b> {userData.coords.lon}</p>
-              <p><b>Device:</b> {userData.device}</p>
+              {/* <p><b>Latitude:</b> {userData.coords.lat}</p>
+              <p><b>Longitude:</b> {userData.coords.lon}</p> */}
+              {/* <p><b>Device:</b> {userData.device}</p> */}
               <p><b>Time:</b> {userData.time}</p>
               <p><b>Address:</b> {userData.address}</p>
             </div>
