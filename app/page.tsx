@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import moment from "moment";
 import {
   Dialog,
   DialogContent,
@@ -39,16 +40,22 @@ export default function Home() {
       const lon = pos.coords.longitude;
 
       try {
+        // const res = await fetch(
+        //   `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+        // );
+        // Currently, we are using nominatim.openstreetmap.org for reverse geocoding, but in production we plan to switch to the Google Maps Geocoding API, as it provides more accurate and reliable results.
         const res = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
-        );
+  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+);
         const geoData = await res.json();
 
         const data: UserData = {
           coords: { lat, lon },
           device: navigator.userAgent,
           time: new Date().toISOString(),
-          address: `${geoData.city || ""}, ${geoData.principalSubdivision || ""}, ${geoData.countryName || ""}`,
+
+          // address: ` ${geoData.address.town || ""}, ${geoData.address.county || ""} ,${geoData.address.state_district || ""},  ${geoData.address.state || ""} ${geoData.address.postcode || ""}, ${geoData.address.country || ""}`,
+        address: geoData.display_name || "Address not found",
         };
 
         setUserData(data);
@@ -119,7 +126,7 @@ export default function Home() {
           <p><b>Latitude:</b> {savedData.coords.lat}</p>
           <p><b>Longitude:</b> {savedData.coords.lon}</p>
           <p><b>Device:</b> {savedData.device}</p>
-          <p><b>Timestamp:</b> {savedData.time}</p>
+          <p><b>Timestamp:</b> {moment(savedData.time).format("YYYY-MM-DD HH:mm:ss")}</p>
           <p><b>Address:</b> {savedData.address}</p>
         </div>
       ) : (
@@ -143,7 +150,7 @@ export default function Home() {
               {/* <p><b>Latitude:</b> {userData.coords.lat}</p>
               <p><b>Longitude:</b> {userData.coords.lon}</p> */}
               {/* <p><b>Device:</b> {userData.device}</p> */}
-              <p><b>Time:</b> {userData.time}</p>
+              <p><b>Time:</b> {moment(userData.time).format("YYYY-MM-DD HH:mm:ss")}</p>
               <p><b>Address:</b> {userData.address}</p>
             </div>
           )}
