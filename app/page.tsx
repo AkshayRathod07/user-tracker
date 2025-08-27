@@ -54,7 +54,8 @@ export default function Home() {
         setUserData(data);
         setShowModal(true);
       } catch (e) {
-        toast("Failed to fetch address details", { type: "error" });
+        const errorMsg = typeof e === "object" && e !== null && "message" in e ? (e as { message: string }).message : String(e);
+        toast(`Failed to fetch address details: ${errorMsg}`, { type: "error" });
       }
     },
     (err) => {
