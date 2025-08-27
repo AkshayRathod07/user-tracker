@@ -1,103 +1,157 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+type UserData = {
+  coords: { lat: number; lon: number };
+  device: string;
+  time: string;
+  address?: string;
+};
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [savedData, setSavedData] = useState<UserData | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  //  Encapsulate location request in a function
+  const requestLocation = useCallback(() => {
+  if (!navigator.geolocation) {
+    toast("Your browser does not support Geolocation API", { type: "error" });
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      try {
+        const res = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+        );
+        const geoData = await res.json();
+
+        const data: UserData = {
+          coords: { lat, lon },
+          device: navigator.userAgent,
+          time: new Date().toISOString(),
+          address: `${geoData.city || ""}, ${geoData.principalSubdivision || ""}, ${geoData.countryName || ""}`,
+        };
+
+        setUserData(data);
+        setShowModal(true);
+      } catch (e) {
+        toast("Failed to fetch address details", { type: "error" });
+      }
+    },
+    (err) => {
+      let message = "Unknown error getting location";
+      if (err.code === 1) message = "Permission denied. Please allow location access.";
+      if (err.code === 2) message = "Location unavailable. Please try again.";
+      if (err.code === 3) message = "Request timed out. Please refresh and retry.";
+
+      toast(
+        <div>
+          <p>{message}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2"
+            onClick={() => {
+              toast.dismiss();
+              requestLocation();
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Retry
+          </Button>
+        </div>,
+        { type: "error", autoClose: false }
+      );
+    },
+    {
+      enableHighAccuracy: true, // forces GPS/WiFi based positioning
+      timeout: 10000,           // wait max 10s
+      maximumAge: 0             // always request fresh
+    }
+  );
+}, []);
+
+
+  useEffect(() => {
+    const existing = localStorage.getItem("userData");
+    if (existing) {
+      setSavedData(JSON.parse(existing));
+      return;
+    }
+    requestLocation(); //  First call
+  }, [requestLocation]);
+
+  const handleConfirm = () => {
+    if (userData) {
+      localStorage.setItem("userData", JSON.stringify(userData));
+      setSavedData(userData);
+    }
+    setShowModal(false);
+  };
+
+  return (
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      <h1 className="text-2xl font-bold mb-6"> User Tracking </h1>
+      <ToastContainer />
+
+      {savedData ? (
+        <div className="p-6 bg-white rounded-xl shadow-md">
+          <h2 className="font-semibold mb-2">Your Data </h2>
+          <p><b>Latitude:</b> {savedData.coords.lat}</p>
+          <p><b>Longitude:</b> {savedData.coords.lon}</p>
+          <p><b>Device:</b> {savedData.device}</p>
+          <p><b>Timestamp:</b> {savedData.time}</p>
+          <p><b>Address:</b> {savedData.address}</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      ) : (
+        <p>Waiting for location permission...</p>
+      )}
+
+      {/* Confirmation Modal */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Your Data</DialogTitle>
+            <DialogDescription>
+              We will save the following details securely:
+            </DialogDescription>
+          </DialogHeader>
+
+          {userData && (
+            <div className="space-y-2 p-2 bg-gray-50 rounded-lg">
+              <p><b>Latitude:</b> {userData.coords.lat}</p>
+              <p><b>Longitude:</b> {userData.coords.lon}</p>
+              <p><b>Device:</b> {userData.device}</p>
+              <p><b>Time:</b> {userData.time}</p>
+              <p><b>Address:</b> {userData.address}</p>
+            </div>
+          )}
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowModal(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirm}>Confirm & Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </main>
   );
 }
