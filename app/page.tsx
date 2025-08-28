@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DeviceInfo from "@/components/DeviceInfo";
+import LocationPermissionHelp from "@/components/LocationPermissionHelp";
+import { UAParser } from "ua-parser-js";
 
 type UserData = {
   coords: { lat: number; lon: number };
@@ -26,6 +28,13 @@ export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [savedData, setSavedData] = useState<UserData | null>(null);
+  const [showLocationHelp, setShowLocationHelp] = useState(false);
+    const [device, setDevice] = useState<any>(null);
+  
+    useEffect(() => {
+      const result = UAParser();
+      setDevice(result);
+    }, []);
 
   //  Encapsulate location request in a function
   const requestLocation = useCallback(() => {
@@ -51,7 +60,7 @@ export default function Home() {
 
         const data: UserData = {
           coords: { lat, lon },
-          device: navigator.userAgent,
+          device: device ? device : navigator.userAgent,
           time: new Date().toISOString(),
 
           // address: ` ${geoData.address.town || ""}, ${geoData.address.county || ""} ,${geoData.address.state_district || ""},  ${geoData.address.state || ""} ${geoData.address.postcode || ""}, ${geoData.address.country || ""}`,
@@ -85,6 +94,19 @@ export default function Home() {
           >
             Retry
           </Button>
+          {err.code === 1 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2 ml-2"
+              onClick={() => {
+                toast.dismiss();
+                setShowLocationHelp(true);
+              }}
+            >
+              How to Enable Location
+            </Button>
+          )}
         </div>,
         { type: "error", autoClose: false }
       );
@@ -133,6 +155,15 @@ export default function Home() {
         <p>Waiting for location permission...</p>
       )}
 
+      {/* Location Permission Help Dialog */}
+      {showLocationHelp && (
+        <>
+          {/* Dynamically import to avoid SSR issues if needed, but here we import statically */}
+          {/* @ts-ignore */}
+          <LocationPermissionHelp open={showLocationHelp} onClose={() => setShowLocationHelp(false)} />
+        </>
+      )}
+
       {/* Confirmation Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent>
@@ -166,3 +197,5 @@ export default function Home() {
     </main>
   );
 }
+
+
