@@ -13,7 +13,7 @@ const WalletDownloadCard: React.FC<Props> = ({ os }) => {
     title = "Download Apple Wallet";
     link = "https://apps.apple.com/us/app/apple-wallet/id1160481993";
     buttonText = "Go to App Store";
-  } else if (os.toLowerCase().includes("android")) {
+  } else if (os.toLowerCase().includes("android") || os.toLowerCase().includes("windows")) {
     title = "Download Google Wallet";
     link = "https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel&hl=en_IN&pli=1";
     buttonText = "Go to Play Store";
