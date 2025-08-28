@@ -47,13 +47,15 @@ export default function Home() {
       setSavedData(JSON.parse(existing));
       return;
     }
-    const result = requestLocation();
-    if (result && result.error) {
-      setLocationError(result.error);
-      if ('code' in result && typeof result.code === 'number') setLocationErrorCode(result.code);
-      toast(result.error, { type: "error" });
+    if (device) {
+      const result = requestLocation();
+      if (result && result.error) {
+        setLocationError(result.error);
+        if ('code' in result && typeof result.code === 'number') setLocationErrorCode(result.code);
+        toast(result.error, { type: "error" });
+      }
     }
-  }, []);
+  }, [device]);
 
 
   const handleConfirm = () => {
