@@ -55,7 +55,7 @@ export default function Home() {
         toast(result.error, { type: "error" });
       }
     }
-  }, [device]);
+  }, [device, requestLocation]);
 
 
   const handleConfirm = () => {

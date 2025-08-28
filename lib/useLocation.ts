@@ -1,6 +1,4 @@
 import { useCallback } from "react";
-import { toast } from "react-toastify";
-import { Button } from "@/components/ui/button";
 
 type UserData = {
   coords: { lat: number; lon: number };
@@ -59,5 +57,5 @@ export default function useLocation({ device, onSuccess, setShowLocationHelp }: 
       }
     );
     return {};
-  }, [device, onSuccess, setShowLocationHelp]);
+  }, [device, onSuccess]);
 }
