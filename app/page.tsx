@@ -29,11 +29,16 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [savedData, setSavedData] = useState<UserData | null>(null);
   const [showLocationHelp, setShowLocationHelp] = useState(false);
-    const [device, setDevice] = useState<any>(null);
+    const [device, setDevice] = useState<string>("");
   
     useEffect(() => {
       const result = UAParser();
-      setDevice(result);
+      // Format device info as a string
+      const os = result.os?.name ? `${result.os.name} ${result.os.version || ''}` : '';
+      const browser = result.browser?.name ? `${result.browser.name} ${result.browser.version || ''}` : '';
+      const deviceType = result.device?.type ? `${result.device.type}` : '';
+      const deviceString = [os, browser, deviceType].filter(Boolean).join(' | ');
+      setDevice(deviceString);
     }, []);
 
   //  Encapsulate location request in a function
@@ -60,11 +65,9 @@ export default function Home() {
 
         const data: UserData = {
           coords: { lat, lon },
-          device: device ? device : navigator.userAgent,
+          device: device,
           time: new Date().toISOString(),
-
-          // address: ` ${geoData.address.town || ""}, ${geoData.address.county || ""} ,${geoData.address.state_district || ""},  ${geoData.address.state || ""} ${geoData.address.postcode || ""}, ${geoData.address.country || ""}`,
-        address: geoData.display_name || "Address not found",
+          address: geoData.display_name || "Address not found",
         };
 
         setUserData(data);
@@ -137,6 +140,16 @@ export default function Home() {
     setShowModal(false);
   };
 
+  // ...existing code...
+  const handleDelete = () => {
+    localStorage.removeItem("userData");
+    setSavedData(null);
+    setUserData(null);
+    toast.success("User data deleted successfully.");
+    // add toast that says refresh page
+    toast.info("Please refresh the page to see the changes.");
+  };
+
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
       <h1 className="text-2xl font-bold mb-6"> User Tracking </h1>
@@ -150,6 +163,7 @@ export default function Home() {
           <p><b>Device:</b> {savedData.device}</p>
           <p><b>Timestamp:</b> {moment(savedData.time).format("YYYY-MM-DD HH:mm:ss")}</p>
           <p><b>Address:</b> {savedData.address}</p>
+          <Button variant="destructive" className="mt-4" onClick={handleDelete}>Delete Data</Button>
         </div>
       ) : (
         <p>Waiting for location permission...</p>
