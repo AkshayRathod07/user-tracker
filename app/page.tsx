@@ -117,7 +117,7 @@ export default function Home() {
       maximumAge: 0             // always request fresh
     }
   );
-}, []);
+}, [device]);
 
 
   useEffect(() => {
@@ -159,7 +159,6 @@ export default function Home() {
       {showLocationHelp && (
         <>
           {/* Dynamically import to avoid SSR issues if needed, but here we import statically */}
-          {/* @ts-ignore */}
           <LocationPermissionHelp open={showLocationHelp} onClose={() => setShowLocationHelp(false)} />
         </>
       )}
