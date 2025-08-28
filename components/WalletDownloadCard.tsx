@@ -8,16 +8,13 @@ const WalletDownloadCard: React.FC<Props> = ({ os }) => {
   console.log("OS detected:", os);
   let title = "";
   let link = "";
-  let buttonText = "";
 
   if (os.toLowerCase().includes("mac") || os.toLowerCase().includes("ios")) {
     title = "Download Apple Wallet";
     link = "https://apps.apple.com/us/app/apple-wallet/id1160481993";
-    buttonText = "Go to App Store";
   } else if (os.toLowerCase().includes("android") || os.toLowerCase().includes("windows")) {
     title = "Download Google Wallet";
     link = "https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel&hl=en_IN&pli=1";
-    buttonText = "Go to Play Store";
   } else {
     return null;
   }
@@ -29,7 +26,7 @@ const WalletDownloadCard: React.FC<Props> = ({ os }) => {
     // Handler for open/fallback logic
     const handleOpenOrStore = () => {
       let deepLink = "";
-      let storeLink = link;
+    const storeLink = link;
       if (title === "Download Apple Wallet") {
         deepLink = appleWalletDeepLink;
       } else if (title === "Download Google Wallet") {
