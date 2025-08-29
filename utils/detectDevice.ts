@@ -1,7 +1,7 @@
 export function getDeviceType () {
   const userAgent = navigator.userAgent;
 
-  console.log("User Agent:", userAgent);
+  // console.log("User Agent:", userAgent);
 
   if (/android/i.test(userAgent)) {
     return "Android";

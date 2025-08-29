@@ -12,8 +12,7 @@ export default function AddToWalletButton() {
     const device = getDeviceType();
     const location = await getUserLocation();
 
-    console.log("User device:", device);
-    console.log("User location:", location);
+    
 
     // if (device === "Android") {
     //   // Example: redirect to Google Wallet Pass

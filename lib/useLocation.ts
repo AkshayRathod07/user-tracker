@@ -15,7 +15,8 @@ type LocationOptions = {
 };
 
 export default function useLocation({ device, onSuccess, setShowLocationHelp }: LocationOptions) {
-  return useCallback(() => {
+    // Memoize the requestLocation function so it is stable across renders
+    const requestLocation = useCallback(() => {
     if (!navigator.geolocation) {
       onSuccess(null);
       return { error: "Your browser does not support Geolocation API" };
@@ -57,5 +58,6 @@ export default function useLocation({ device, onSuccess, setShowLocationHelp }: 
       }
     );
     return {};
-  }, [device, onSuccess]);
+    }, [device, onSuccess]);
+    return requestLocation;
 }

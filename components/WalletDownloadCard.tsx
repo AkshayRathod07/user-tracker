@@ -5,7 +5,7 @@ interface Props {
 }
 
 const WalletDownloadCard: React.FC<Props> = ({ os }) => {
-  console.log("OS detected:", os);
+  // console.log("OS detected:", os);
   let title = "";
   let link = "";
 
