@@ -12,7 +12,7 @@ export default function DeviceInfo() {
   }, []);
 
   if (!device) return <p>Loading device info...</p>;
-  console.log(device);
+
   return (
     <div className="p-4 rounded-xl shadow-md bg-white">
       <h2 className="font-bold text-lg mb-2">Device Info</h2>
