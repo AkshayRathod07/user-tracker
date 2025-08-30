@@ -9,6 +9,7 @@ import ConfirmDataModal from "@/components/ConfirmDataModal";
 import useDeviceInfo from "@/lib/useDeviceInfo";
 import WalletDownloadCard from "@/components/WalletDownloadCard";
 import useLocation from "@/lib/useLocation";
+import AddToWalletButton from "@/components/AddToWalletButton";
 
 type UserData = {
   coords: { lat: number; lon: number };
@@ -114,6 +115,8 @@ export default function Home() {
         ) : (
           <p className="mt-6">Waiting for location permission...</p>
         )}
+
+        <AddToWalletButton />
 
         {/* Location Permission Help Dialog */}
         {showLocationHelp && (

@@ -1,39 +1,24 @@
 "use client";
-import { useState } from "react";
-
-import { getDeviceType, getUserLocation } from "@/utils/detectDevice";
 
 export default function AddToWalletButton() {
-  const [loading, setLoading] = useState(false);
+  const handleAddToWallet = async () => {
+    const res = await fetch("/api/wallet/event");
+    const data = await res.json();
+    console.log("add wallet", data);
 
-  const handleClick = async () => {
-    setLoading(true);
-
-    const device = getDeviceType();
-    const location = await getUserLocation();
-
-    
-
-    // if (device === "Android") {
-    //   // Example: redirect to Google Wallet Pass
-    //   window.location.href = "https://pay.google.com/gp/v/save/EXAMPLE_PASS_ID";
-    // } else if (device === "iOS") {
-    //   // Example: redirect to Apple Wallet pass (.pkpass file)
-    //   window.location.href = "https://example.com/your-pass.pkpass";
-    // } else {
-    //   alert("Please open on a mobile device (Android/iOS).");
-    // }
-
-    setLoading(false);
+    if (data.saveUrl) {
+      window.open(data.saveUrl, "_blank");
+    } else {
+      alert("Failed to generate pass: " + (data.error || "No save URL returned"));
+    }
   };
 
   return (
     <button
-      onClick={handleClick}
-      className="px-4 py-2 bg-blue-600 text-white rounded-md"
-      disabled={loading}
+      onClick={handleAddToWallet}
+      className="bg-green-600 text-white px-4 py-2 rounded-lg"
     >
-      {loading ? "Checking..." : "Add to Wallet"}
+      Add to Google Wallet
     </button>
   );
 }
