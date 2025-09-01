@@ -1,9 +1,7 @@
-
 import { google } from "googleapis";
-import fs from "fs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
-import path from "path";
+
 
 export async function GET() {
   try {
@@ -14,7 +12,7 @@ export async function GET() {
 
 
   const auth = new google.auth.GoogleAuth({
-      keyFile: keyData,
+      credentials: keyData,
       scopes: ["https://www.googleapis.com/auth/wallet_object.issuer"],
     });
 
