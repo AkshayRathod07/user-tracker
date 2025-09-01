@@ -7,14 +7,18 @@ import path from "path";
 
 export async function GET() {
   try {
-    const keyPath = path.join(process.cwd(), process.env.GOOGLE_WALLET_KEY!);
+  // Decode base64 key from env
+    const keyData = JSON.parse(
+      Buffer.from(process.env.GOOGLE_WALLET_KEY_BASE64!, "base64").toString("utf-8")
+    );
+
 
   const auth = new google.auth.GoogleAuth({
-      keyFile: keyPath,
+      keyFile: keyData,
       scopes: ["https://www.googleapis.com/auth/wallet_object.issuer"],
     });
 
-    const client = await auth.getClient();
+    
     const wallet = google.walletobjects({ version: "v1", auth });
 
     const issuerId = process.env.ISSUER_ID!;
@@ -83,8 +87,8 @@ export async function GET() {
     }
 
     // Read issuer key file
-    const keyFile = fs.readFileSync(keyPath, "utf-8");
-    const keyData = JSON.parse(keyFile);
+    // const keyFile = fs.readFileSync(keyPath, "utf-8");
+    // const keyData = JSON.parse(keyFile);
     const privateKey = keyData.private_key;
     const issuerEmail = keyData.client_email;
 
