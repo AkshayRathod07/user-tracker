@@ -2,7 +2,7 @@
 
 export default function AddToWalletButton() {
   const handleAddToWallet = async () => {
-    const res = await fetch("/api/wallet/event");
+    const res = await fetch("/api/wallet/event/android");
     const data = await res.json();
     console.log("add wallet", data);
 
