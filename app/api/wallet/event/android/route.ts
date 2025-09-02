@@ -10,6 +10,7 @@ export async function GET() {
       Buffer.from(process.env.GOOGLE_WALLET_KEY_BASE64!, "base64").toString("utf-8")
     );
 
+    console.log('called getWalletEvent api')
 
   const auth = new google.auth.GoogleAuth({
       credentials: keyData,
